@@ -54,7 +54,7 @@ def close_db(e=None):
 def init_db():
     with app.app_context():
         db = get_db()
-        print("Initializing the database...")
+        print("Initializing the database....")
         db.execute('CREATE TABLE IF NOT EXISTS moods (id INTEGER PRIMARY KEY, mood TEXT)')
         db.commit()
         print("Database initialized.")

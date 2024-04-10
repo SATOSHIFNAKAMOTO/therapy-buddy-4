@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker</title>
+    <!-- Link to your stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Mood Tracker</h1>
+    {% if user_email %}
+        <p>Welcome back, {{ user_email }}!</p>
+        <a href="/logout">Sign Out</a>
+    {% else %}
+        <div class="welcome-message">
+            <p>Hi, welcome to Mood Tracker! Please login.</p>
+            <a href="{{ url_for('login') }}">Login</a>
+        </div>
+    {% endif %}
+<!-- Mood submission form -->
+<form id="mood-form" action="/submit_mood" method="post">
+    <label for="mood">How are you feeling?</label>
+    <select name="mood" id="mood">
+        <option value="happy">Happy</option>
+        <option value="sad">Sad</option>
+        <option value="excited">Excited</option>
+        <option value="angry">Angry</option>
+    </select>
+    <button type="submit">Submit</button>
+
+<!-- Where moods will be displayed -->
+<div id="mood-display">
+    {% for mood in moods %}
+        <p>{{ mood['mood'] }}</p>
+    {% endfor %}
+</div>
+
+
+{% if submitted_mood %}
+    <p>You're feeling: {{ submitted_mood }}</p>
+{% endif %}
+
+
+</form> <div id="mood-list">
+</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('mood-form');
+
+            form.onsubmit = function(event) {
+                event.preventDefault();
+
+                const mood = form.elements['mood'].value;
+
+                fetch('/submit_mood', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ mood: mood })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        const moodList = document.getElementById('mood-display');
+                        const moodElement = document.createElement('p');
+                        moodElement.textContent = data.mood;
+                        moodList.appendChild(moodElement);
+                    } else {
+                        console.error('An error occurred while submitting the mood');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            };
+        });
+
+    </script>
+    <!-- Link to your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
